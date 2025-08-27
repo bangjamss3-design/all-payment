@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Gateway - Nizaam</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+        
+        body {
+            background-color: #0a0a1a;
+            color: #00ffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Welcome Screen */
+        #welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: rgba(0, 5, 20, 0.97);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 1.2s ease-out;
+        }
+        
+        .welcome-content {
+            text-align: center;
+            padding: 3rem;
+            border: 2px solid #00ffff;
+            border-radius: 15px;
+            background-color: rgba(0, 10, 30, 0.9);
+            box-shadow: 0 0 30px #00ffff;
+            max-width: 500px;
+            width: 90%;
+            animation: borderGlow 3s infinite alternate;
+        }
+        
+        .welcome-emoji {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            animation: pulse 2s infinite;
+            filter: drop-shadow(0 0 10px #0077ff);
+        }
+        
+        .welcome-text {
+            font-size: 3rem;
+            color: #0077ff;
+            text-shadow: 0 0 15px #0077ff;
+            margin-bottom: 2rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        
+        .enter-button {
+            padding: 15px 40px;
+            background: linear-gradient(45deg, #0077ff, #00ffff);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-weight: bold;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 0 20px #0077ff;
+            letter-spacing: 1px;
+        }
+        
+        .enter-button:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 30px #00ffff;
+            letter-spacing: 2px;
+        }
+        
+        /* Hacking Animation Background */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.85;
+        }
+        
+        /* Main Content */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2.5rem;
+            background-color: rgba(0, 5, 20, 0.85);
+            border: 1px solid #00ffff;
+            border-radius: 15px;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.4);
+            margin-top: 3rem;
+            margin-bottom: 3rem;
+            backdrop-filter: blur(5px);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        .skull-logo {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            animation: glow 2s infinite alternate;
+            filter: drop-shadow(0 0 15px #ff0000);
+        }
+        
+        .jolly-roger {
+            display: inline-block;
+            background: linear-gradient(135deg, #000000, #222222);
+            border-radius: 50%;
+            padding: 15px;
+            box-shadow: 0 0 25px rgba(255, 0, 0, 0.7);
+        }
+        
+        .title {
+            font-size: 2.8rem;
+            color: #00ffff;
+            text-shadow: 0 0 15px #00ffff;
+            margin-bottom: 1rem;
+            letter-spacing: 3px;
+        }
+        
+        .subtitle {
+            color: #00ffaa;
+            margin-bottom: 2rem;
+            font-size: 1.2rem;
+            text-shadow: 0 0 10px #00ffaa;
+        }
+        
+        .payment-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2.5rem;
+        }
+        
+        .payment-option {
+            background: linear-gradient(135deg, rgba(0, 15, 35, 0.8), rgba(0, 30, 60, 0.8));
+            border: 1px solid #00ffaa;
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .payment-option::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            z-index: -1;
+            background: linear-gradient(45deg, #00ffff, #00ffaa, #0077ff, #00ffff);
+            background-size: 400%;
+            border-radius: 12px;
+            animation: steam 20s linear infinite;
+        }
+        
+        .payment-option:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0, 255, 170, 0.5);
+        }
+        
+        .payment-title {
+            font-size: 1.5rem;
+            color: #00ffaa;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            text-shadow: 0 0 8px #00ffaa;
+        }
+        
+        .payment-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(0, 20, 40, 0.7);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border: 1px solid #0077ff;
+        }
+        
+        .payment-number {
+            font-size: 1.2rem;
+            word-break: break-all;
+            padding-right: 10px;
+            text-shadow: 0 0 5px #00ffff;
+        }
+        
+        .copy-btn {
+            background: linear-gradient(45deg, #0077ff, #00ffff);
+            border: none;
+            border-radius: 6px;
+            color: #000;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        
+        .copy-btn:hover {
+            background: linear-gradient(45deg, #00ffff, #0077ff);
+            transform: scale(1.05);
+        }
+        
+        .qr-container {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        
+        .qr-title {
+            font-size: 1.3rem;
+            color: #00ffaa;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 8px #00ffaa;
+        }
+        
+        .qr-code {
+            display: block;
+            margin: 0 auto;
+            max-width: 220px;
+            border: 2px solid #00ffff;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+            transition: all 0.3s ease;
+        }
+        
+        .qr-code:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1.5rem;
+            color: #00aaff;
+            font-size: 1.1rem;
+            text-shadow: 0 0 5px #00aaff;
+            border-top: 1px solid #0077ff;
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff; }
+            to { text-shadow: 0 0 15px #00ffff, 0 0 30px #00ffff, 0 0 40px #00ffff; }
+        }
+        
+        @keyframes borderGlow {
+            from { box-shadow: 0 0 20px #00ffff; }
+            to { box-shadow: 0 0 40px #00ffff, 0 0 60px #0077ff; }
+        }
+        
+        @keyframes steam {
+            0% { background-position: 0 0; }
+            100% { background-position: 400% 0; }
+        }
+        
+        /* Matrix rain animation */
+        canvas {
+            display: block;
+        }
+        
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 255, 170, 0.9);
+            color: #000;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 255, 170, 0.7);
+            z-index: 1000;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        /* Audio control */
+        .audio-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 15, 35, 0.8);
+            border: 1px solid #00ffff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 999;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+        }
+        
+        .audio-control i {
+            font-size: 1.5rem;
+            color: #00ffff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Welcome Screen -->
+    <div id="welcome-screen">
+        <div class="welcome-content">
+            <div class="welcome-emoji">😊</div>
+            <div class="welcome-text">WELCOME</div>
+            <button class="enter-button" onclick="enterSite()">ENTER</button>
+        </div>
+    </div>
+    
+    <!-- Hacking Animation Background -->
+    <div class="matrix-bg">
+        <canvas id="matrix"></canvas>
+    </div>
+    
+    <!-- Audio Control -->
+    <div class="audio-control" onclick="toggleMusic()">
+        <i class="fas fa-volume-up"></i>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="container">
+        <div class="header">
+            <div class="skull-logo">
+                <div class="jolly-roger">☠️</div>
+            </div>
+            <h1 class="title">SS BUKTI TF</h1>
+            <p class="subtitle">Silakan pilih metode pembayaran di bawah</p>
+        </div>
+        
+        <div class="payment-options">
+            <div class="payment-option">
+                <h2 class="payment-title">DANA - NIZAAM</h2>
+                <div class="payment-details">
+                    <span class="payment-number">081288077760</span>
+                    <button class="copy-btn" onclick="copyText('081288077760')">COPY</button>
+                </div>
+            </div>
+            
+            <div class="payment-option">
+                <h2 class="payment-title">GOPAY - NIZAAM</h2>
+                <div class="payment-details">
+                    <span class="payment-number">081288077760</span>
+                    <button class="copy-btn" onclick="copyText('081288077760')">COPY</button>
+                </div>
+            </div>
+            
+            <div class="payment-option">
+                <h2 class="payment-title">OVO - NIZAAM</h2>
+                <div class="payment-details">
+                    <span class="payment-number">083187711388</span>
+                    <button class="copy-btn" onclick="copyText('083187711388')">COPY</button>
+                </div>
+            </div>
+            
+            <div class="payment-option">
+                <h2 class="payment-title">QRIS - NIZAAM</h2>
+                <div class="qr-container">
+                    <img src="https://files.catbox.moe/wd0zqy.jpg" alt="QR Code" class="qr-code">
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Terima kasih telah melakukan pembayaran • Harap screenshot bukti transfer</p>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">Teks berhasil disalin!</div>
+    
+    <!-- Audio Element -->
+    <audio id="bgMusic" loop>
+        <source src="https://voca.ro/1h9cb9MoZe2R" type="audio/mpeg">
+    </audio>
+    
+    <script>
+        // Welcome screen function
+        function enterSite() {
+            const welcomeScreen = document.getElementById('welcome-screen');
+            welcomeScreen.style.opacity = '0';
+            
+            setTimeout(() => {
+                welcomeScreen.style.display = 'none';
+                // Play background music
+                const audio = document.getElementById('bgMusic');
+                audio.play().catch(e => {
+                    console.log("Autoplay prevented: ", e);
+                });
+            }, 1200);
+        }
+        
+        // Matrix background animation
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const letters = '01010101010101010101010101010101';
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        
+        const drops = [];
+        for (let i = 0; i < columns; i++) {
+            drops[i] = Math.floor(Math.random() * canvas.height / fontSize);
+        }
+        
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(10, 10, 30, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#0f0';
+            ctx.font = `${fontSize}px monospace`;
+            
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters[Math.floor(Math.random() * letters.length)];
+                const x = i * fontSize;
+                const y = drops[i] * fontSize;
+                
+                ctx.fillText(text, x, y);
+                
+                if (y > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                
+                drops[i]++;
+            }
+        }
+        
+        // Adjust canvas on resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        // Animation loop
+        setInterval(drawMatrix, 33);
+        
+        // Copy text function
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Nomor berhasil disalin!');
+            }).catch(err => {
+                console.error('Gagal menyalin teks: ', err);
+                showToast('Gagal menyalin nomor');
+            });
+        }
+        
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+        
+        // Toggle music function
+        function toggleMusic() {
+            const audio = document.getElementById('bgMusic');
+            const audioControl = document.querySelector('.audio-control i');
+            
+            if (audio.paused) {
+                audio.play();
+                audioControl.classList.remove('fa-volume-mute');
+                audioControl.classList.add('fa-volume-up');
+                showToast('Musik dihidupkan');
+            } else {
+                audio.pause();
+                audioControl.classList.remove('fa-volume-up');
+                audioControl.classList.add('fa-volume-mute');
+                showToast('Musik dimatikan');
+            }
+        }
+        
+        // Try to autoplay music with gesture requirement
+        document.body.addEventListener('click', function() {
+            const audio = document.getElementById('bgMusic');
+            if (audio.paused && document.getElementById('welcome-screen').style.display === 'none') {
+                audio.play().catch(e => console.log("Audio play failed:", e));
+            }
+        });
+    </script>
+</body>
+</html>
